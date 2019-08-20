@@ -8,14 +8,49 @@ output:
 
 ## Loading and preprocessing the data
 
+First we must unzip the file with the data and read from it. Knowing that some
+data is missing, we shall also tidy the data so there are no missing values 
+when we start analyzing the data.
+
+```{r echo=TRUE}
+unzip("activity.zip")
+data <- read.csv("activity.csv")
+clean_data <- data[complete.cases(data) == TRUE,]
+```
 
 
 ## What is mean total number of steps taken per day?
 
+Here, we will first create a histogram of the total steps taken in a day, 
+after which we will calculate the mean. Since the data is given in 5-minute
+intervals, first we must aggregate the steps in all those intervals in a day
+and then create the histogram.
+
+```{r echo=TRUE}
+total_steps <- aggregate(steps ~ date, data = clean_data, FUN = sum)
+hist(total_steps$steps, main = "Total Steps Taken In A Day", xlab = "Steps")
+mean_steps <- mean(total_steps$steps)
+```
+
+The mean number of steps taken in a day is `{r mean_steps}`.
 
 
 ## What is the average daily activity pattern?
 
+Now we need to create a time series graph of the 5-minute intervals on the
+x-axis and the average steps taken in that interval across all days on the
+y-axis. Again, we will aggregate the data, but this time it'll be according
+to the interval rather than the day.
+
+```{r echo=TRUE}
+average_steps <- aggregate(steps ~ interval, data = clean_data, FUN = mean)
+plot(average_steps$interval, 
+     average_steps$steps, 
+     type = "l", 
+     main = "Average Steps Across All Days Per Interval", 
+     xlab = "Interval", 
+     ylab = "Average Steps")
+```
 
 
 ## Imputing missing values
