@@ -12,7 +12,8 @@ First we must unzip the file with the data and read from it. Knowing that some
 data is missing, we shall also tidy the data so there are no missing values 
 when we start analyzing the data.
 
-```{r echo=TRUE}
+
+```r
 unzip("activity.zip")
 data <- read.csv("activity.csv")
 clean_data <- data[complete.cases(data) == TRUE,]
@@ -26,18 +27,24 @@ after which we will calculate the mean. Since the data is given in 5-minute
 intervals, first we must aggregate the steps in all those intervals in a day
 and then create the histogram.
 
-```{r echo=TRUE}
+
+```r
 total_steps <- aggregate(steps ~ date, data = clean_data, FUN = sum)
 hist(total_steps$steps,
      main = "Total Steps Taken In A Day", 
      xlab = "Steps",
      col = "blue")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
 mean_steps <- mean(total_steps$steps)
 median_steps <- median(total_steps$steps)
 ```
 
-The mean number of steps taken in a day is `r mean_steps` and the median
-number of steps is `r median_steps`.
+The mean number of steps taken in a day is 1.0766189\times 10^{4} and the median
+number of steps is 10765.
 
 
 ## What is the average daily activity pattern?
@@ -47,7 +54,8 @@ x-axis and the average steps taken in that interval across all days on the
 y-axis. Again, we will aggregate the data, but this time it'll be according
 to the interval rather than the day.
 
-```{r echo=TRUE}
+
+```r
 average_steps <- aggregate(steps ~ interval, data = clean_data, FUN = mean)
 plot(average_steps$interval, 
      average_steps$steps, 
@@ -56,6 +64,11 @@ plot(average_steps$interval,
      xlab = "Interval", 
      ylab = "Average Steps",
      col = "blue")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 max_steps <- average_steps[which.max(average_steps$steps),1]
 ```
 
@@ -65,13 +78,14 @@ Since we only want the interval, the one with the highest average will also have
 the maximum number of steps since the amount of data we have on steps for each
 interval is the same.
 
-Hence, the interval which has the maximum steps is `r max_steps`.
+Hence, the interval which has the maximum steps is 835.
 
 ## Imputing missing values
 
 Here we will work with the original set of data that has some values missing.
 
-```{r echo=TRUE}
+
+```r
 missing_val <- nrow(data[is.na(data),])
 ```
 
@@ -83,7 +97,8 @@ missing values. This would be a good way to fill missing values because barring
 unforeseen circumstances on any given day, on average the steps taken at specific 
 intervals will remain consistent.
 
-```{r echo=TRUE}
+
+```r
 new_dat <- data
 ## Helper that extracts the average steps for a given interval
 ## Assumes the arguments given to the function are valid
@@ -99,11 +114,16 @@ hist(imp$steps,
      main = "Total Steps Taken In A Day With Imputed Data",
      xlab = "Steps",
      col = "blue")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+```r
 imp_mean <- mean(imp$steps)
 imp_median <- median(imp$steps)
 ```
 
-The mean steps in a day is now `r imp_mean` and the median is `r imp_median`.
+The mean steps in a day is now 1.0766189\times 10^{4} and the median is 1.0766189\times 10^{4}.
 Imputing the missing data has no impact on the average total steps taken daily but the
 median does increase slightly.
 
@@ -112,7 +132,8 @@ median does increase slightly.
 Using the data with imputed values, we first create a factor variable to
 differentiate between weekdays and weekends
 
-```{r echo=TRUE}
+
+```r
 new_dat["day"] = weekdays(as.Date(new_dat$date))
 new_dat$day[new_dat$day %in% c("Saturday","Sunday")] <- "weekend"
 new_dat$day[new_dat$day != "weekend"] <- "weekday"
@@ -136,3 +157,5 @@ plot(wend$interval,
      ylab = "Average Steps",
      col = "blue")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
